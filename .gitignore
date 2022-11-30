@@ -1,3 +1,4 @@
 node_modules
+pnpm-lock.yaml
 # Keep environment variables out of version control
 .env
