@@ -5,33 +5,33 @@ const todo =  require(`${__controller_dir}/todoController.js`);
 const router = express.Router()
 
 router.get("/", async function(req, res, next) {
-    const products = await todo.getTodo()
+    const todos = await todo.getTodo()
 
-    helper.sendResponse(res, products)
+    helper.sendResponse(res, todos)
 })
 
 router.get("/:id", async function(req, res, next) {
-    const product = await todo.getTodoById(req.params.id)
+    const todo = await todo.getTodoById(req.params.id)
 
-    helper.sendResponse(res, product)
+    helper.sendResponse(res, todo)
 })
 
 router.post("/", async function(req, res, next) {
-    const products = await todo.createTodo(req.body)
+    const todos = await todo.createTodo(req.body)
 
-    helper.sendResponse(res, products)
+    helper.sendResponse(res, todos)
 })
 
 router.put("/:id", async function(req, res, next) {
-    const products = await todo.updateTodo({ ...req.body, id: req.params.id })
+    const todos = await todo.updateTodo({ ...req.body, id: req.params.id })
 
-    helper.sendResponse(res, products)
+    helper.sendResponse(res, todos)
 })
 
 router.delete("/:id", async function(req, res, next) {
-    const products = await todo.deleteTodo(req.params.id)
+    const todos = await todo.deleteTodo(req.params.id)
 
-    helper.sendResponse(res, products)
+    helper.sendResponse(res, todos)
 })
 
 module.exports = router;
