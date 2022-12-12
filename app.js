@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const express = require("express");
 const path = require('path');
 const fs = require('fs');
+const logger = require('morgan');
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -34,6 +35,10 @@ function getRoutersSync(__path, __extension) {
 
 	return files;
 };
+
+if(process.env.DEBUG){
+	app.use(logger('dev'));
+}
 
 app.use(cors());
 app.use(express.json());
