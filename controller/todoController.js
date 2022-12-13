@@ -80,6 +80,14 @@ class _todo {
                 }
             })
 
+            if (list_todo == null) {
+                return {
+                    code: 404,
+                    status: false,
+                    error: "Data tidak ditemukan!"
+                }
+            }
+
             return {
                 code: 200,
                 status: true,

@@ -1,5 +1,5 @@
 const express =  require("express");
-const helper = require("../../class/helper");
+const helper = require(__class_dir + "/helper");
 const todo =  require(`${__controller_dir}/todoController.js`);
 
 const router = express.Router()
@@ -11,9 +11,9 @@ router.get("/", async function(req, res, next) {
 })
 
 router.get("/:id", async function(req, res, next) {
-    const todo = await todo.getTodoById(req.params.id)
+    const todos = await todo.getTodoById(req.params.id)
 
-    helper.sendResponse(res, todo)
+    helper.sendResponse(res, todos)
 })
 
 router.post("/", async function(req, res, next) {
