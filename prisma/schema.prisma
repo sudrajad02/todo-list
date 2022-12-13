@@ -17,3 +17,36 @@ model todo {
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
 }
+
+model auth_level {
+  level_id Int @id @default(autoincrement())
+  level_name String?
+  level Int?
+
+  auth_level_access auth_level_access?
+  auth_user_level auth_user_level?
+}
+
+model auth_level_access {
+  level auth_level @relation(fields: [level_access_id], references: [level_id])
+  level_access_id Int @unique
+  level_access_path String?
+}
+
+model auth_user {
+  user_id Int @id @default(autoincrement())
+  user_name String? @unique
+  password String?
+  createdeAt DateTime? @default(now())
+  lastAccessAt DateTime? @updatedAt
+
+  auth_user_level auth_user_level?
+}
+
+model auth_user_level {
+  user auth_user @relation(fields: [user_level_id], references: [user_id])
+  level auth_level @relation(fields: [level_access_id], references: [level_id])
+  
+  user_level_id Int @unique
+  level_access_id Int @unique
+}
