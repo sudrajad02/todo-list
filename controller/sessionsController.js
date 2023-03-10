@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const helper = require(__class_dir + "/helper");
 const hash = require(__class_dir + '/hash.js');
 
 const dayjs = require('dayjs')
@@ -55,7 +56,71 @@ const jwt = {
     },
 };
 
+const getUserExistence = async function (userName) {
+    try {
+        const usr = await prisma.auth_user.findFirst({
+            where: {
+                user_name: userName
+            }
+        })
+    
+        return usr ? true : false
+    } catch (error) {
+        return false
+    }
+    
+};
+
+const tokenValidation = async function (token) {
+	const validity = await jwt.validation(token);
+
+	if (!validity.status) {
+		return validity;
+	}
+
+	validity.status &= await getUserExistence(validity.data.u);
+	return validity;
+};
+
 class _sessions {
+    async sessionChecker(req, res, next) {
+		try {
+            if (req.headers && req.headers.authorization) {
+                const authorization = req.headers.authorization.split(' ');
+
+                if (authorization[0].toLowerCase() == 'bearer' && authorization[1]) {
+                    const isValid = await tokenValidation(authorization[1]);
+
+                    if (isValid.status) {
+                        req.decoded = isValid.data;
+                        next();
+                        return true;
+                    } else {
+                        throw isValid;
+                    }
+                } else {
+                    throw 'Invalid authorization';
+                }   
+            } else {
+                throw {
+                    code: 404,
+                    status: false,
+                    error: 'Token not defined'
+                };
+            }
+		} catch (error) {
+            if (typeof(error) == "object") {
+                return helper.sendResponse(res, error)
+            }
+
+            helper.sendResponse(res, {
+                code: 400,
+                status: false,
+                error: error
+            })
+		}
+	}
+
     async loginValidation(data) {
 		const username = data.username
 		const password = data.password
@@ -73,12 +138,16 @@ class _sessions {
 
 		try {
 			if (!userExist) {
-				throw false;
+				throw {
+                    code: 404,
+                    status: false,
+                    error: "User not found"
+                };
 			}
 
 			const expiresAt = dayjs().add(expired, 'seconds').format('YYYY-MM-DD HH:mm:ss');
 			const payload = {
-					u: userExist.user,
+					u: userExist.user_name,
 					// l: userExist.level,
 					t: expiresAt,
 					v: hash.randomString(18, 'base64'),
@@ -91,10 +160,14 @@ class _sessions {
                 data: {token, expiresAt},
             }
 		} catch (error) {
+            if (typeof(error) == "object") {
+                return error
+            }
+
 			return {
                 code: 400,
                 status: false,
-                error: error.message
+                error: error
             }
 		}
 	}
